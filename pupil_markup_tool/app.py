@@ -17,7 +17,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 
 from pupil_markup import Ui_Dialog
-from utils.ellipse_equation_solver import EllipseEquationSolver
+from utils.ellipse import solve_ellipse_equation, ellipse_equation_to_canonical
 
 
 class Markup:
@@ -72,9 +72,8 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
         self.markup.visualization = self.markup.image.copy()
         scale = self.markup.transform[0, 0]
         if len(points) >= self.points_max_cnt:
-            solver = EllipseEquationSolver()
-            equation = solver.solve(points)
-            canonical = solver.equation2canonical(equation)
+            equation = solve_ellipse_equation(points)
+            canonical = ellipse_equation_to_canonical(equation)
             if canonical is not None:
                 a, b, x, y, teta = canonical
                 scale = self.markup.transform[0, 0]

@@ -39,11 +39,8 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
         self.labelImage.mousePressEvent = self.label_image_mouse_pressed
 
         self.markup = Markup()
-        self.loaded_img = None
-        self.scaled_img = None
-        self.loaded_img_scale = None
-        self.loaded_img_offset = None
         self.selected_points = []
+        self.points_max_cnt = 6
 
     def set_source_image(self, cv_image):
         self.markup.src_image = cv_image.copy()
@@ -74,20 +71,22 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
     def update_image(self, points=[]):
         self.markup.visualization = self.markup.image.copy()
         scale = self.markup.transform[0, 0]
-        if len(points) >= 5:
+        if len(points) >= self.points_max_cnt:
             solver = EllipseEquationSolver()
             equation = solver.solve(points)
-            a, b, x, y, teta = solver.equation2canonical(equation)
-            scale = self.markup.transform[0, 0]
-            center_coordinates = (int(x * scale), int(y * scale))
-            axesLength = (int(a * scale), int(b * scale))
-            angle = teta * 180. / np.pi
-            startAngle = 0
-            endAngle = 360
-            color = (0, 0, 255)
-            thickness = 5
-            self.markup.visualization = cv2.ellipse(self.markup.visualization, center_coordinates, axesLength, angle, startAngle, endAngle,
-                              color, thickness)
+            canonical = solver.equation2canonical(equation)
+            if canonical is not None:
+                a, b, x, y, teta = canonical
+                scale = self.markup.transform[0, 0]
+                center_coordinates = (int(x * scale), int(y * scale))
+                axesLength = (int(a * scale), int(b * scale))
+                angle = teta * 180. / np.pi
+                startAngle = 0
+                endAngle = 360
+                color = (0, 0, 255)
+                thickness = 5
+                self.markup.visualization = cv2.ellipse(self.markup.visualization, center_coordinates, axesLength, angle, startAngle, endAngle,
+                                  color, thickness)
         for x, y in points:
             self.markup.visualization = cv2.circle(self.markup.visualization, (int(x * scale), int(y * scale)), 5, (0, 255, 255), 3)
         rgb_image = cv2.cvtColor(self.markup.visualization, cv2.COLOR_BGR2RGB)
@@ -112,7 +111,7 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
         widget_coord = np.asarray([[event.x(), event.y()]])
         x, y = np.dot(widget_coord, self.markup.inv_transform)[0][:2]
         self.selected_points.append((x, y))
-        if len(self.selected_points) > 5:
+        if len(self.selected_points) > self.points_max_cnt:
             self.selected_points.pop(0)
         self.update_image(self.selected_points)
 

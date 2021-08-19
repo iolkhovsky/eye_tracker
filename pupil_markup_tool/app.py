@@ -17,7 +17,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 
 from pupil_markup import Ui_Dialog
-from utils.ellipse import solve_ellipse_equation, ellipse_equation_to_canonical
+from utils.ellipse import solve_ellipse_equation, ellipse_equation_to_canonical, visualize_ellipse
 
 
 class Markup:
@@ -73,19 +73,20 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
         scale = self.markup.transform[0, 0]
         if len(points) >= self.points_max_cnt:
             equation = solve_ellipse_equation(points)
+            if equation is not None:
+                a, b, c, d, e, f = equation
+                self.labelEllipseEquation.setText(f"{'{:.3f}'.format(a)}x2 + {'{:.3f}'.format(b)}xy + "
+                                                  f"{'{:.3f}'.format(c)}y2 + {'{:.3f}'.format(d)}x + "
+                                                  f"{'{:.3f}'.format(e)}y + {'{:.3f}'.format(f)} = 0")
             canonical = ellipse_equation_to_canonical(equation)
             if canonical is not None:
                 a, b, x, y, teta = canonical
-                scale = self.markup.transform[0, 0]
-                center_coordinates = (int(x * scale), int(y * scale))
-                axesLength = (int(a * scale), int(b * scale))
-                angle = teta * 180. / np.pi
-                startAngle = 0
-                endAngle = 360
-                color = (0, 0, 255)
-                thickness = 5
-                self.markup.visualization = cv2.ellipse(self.markup.visualization, center_coordinates, axesLength, angle, startAngle, endAngle,
-                                  color, thickness)
+                self.label_center_x.setText("{:.2f}".format(x))
+                self.label_center_y.setText("{:.2f}".format(y))
+                self.label_semi_a.setText("{:.2f}".format(a))
+                self.label_semi_b.setText("{:.2f}".format(b))
+                self.label_teta.setText("{:.2f}".format(teta * 180. / np.pi))
+                self.markup.visualization = visualize_ellipse(canonical, self.markup.visualization, self.markup.transform)
         for x, y in points:
             self.markup.visualization = cv2.circle(self.markup.visualization, (int(x * scale), int(y * scale)), 5, (0, 255, 255), 3)
         rgb_image = cv2.cvtColor(self.markup.visualization, cv2.COLOR_BGR2RGB)

@@ -1,3 +1,4 @@
+import cv2
 import numpy as np
 
 
@@ -53,3 +54,38 @@ def ellipse_equation_to_canonical(equation):
     ) ** 0.5
     b_axis = num / denum
     return a_axis, b_axis, x, y, teta
+
+
+def visualize_ellipse(ellipse_canonical, img, transform=None):
+    vis_img = img.copy()
+    a, b, x, y, teta = ellipse_canonical
+    scale = 1.
+    if transform is not None:
+        scale = transform[0, 0]
+    center_x, center_y = int(x * scale), int(y * scale)
+    axis_a, axis_b = int(a * scale), int(b * scale)
+    teta_degrees = teta * 180. / np.pi
+    start_angle, stop_angle = 0, 360
+    ellipse_color = (0, 0, 255)
+    ellipse_thickness = 2
+    vis_img = cv2.ellipse(vis_img, (center_x, center_y), (axis_a, axis_b), teta_degrees, start_angle, stop_angle,
+                          ellipse_color, ellipse_thickness)
+    a_axis_start = (
+        int(center_x - axis_a * np.cos(teta)),
+        int(center_y + axis_a * np.sin(teta))
+    )
+    a_axis_stop = (
+        int(center_x + axis_a * np.cos(teta)),
+        int(center_y - axis_a * np.sin(teta))
+    )
+    vis_img = cv2.line(vis_img, a_axis_start, a_axis_stop, (0, 255, 0), 1)
+    b_axis_start = (
+        int(center_x - axis_b * np.sin(teta)),
+        int(center_y - axis_b * np.cos(teta))
+    )
+    b_axis_stop = (
+        int(center_x + axis_b * np.sin(teta)),
+        int(center_y + axis_b * np.cos(teta))
+    )
+    vis_img = cv2.line(vis_img, b_axis_start, b_axis_stop, (255, 0, 0), 1)
+    return vis_img

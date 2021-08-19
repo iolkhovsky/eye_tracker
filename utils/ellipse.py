@@ -57,8 +57,13 @@ def ellipse_equation_to_canonical(equation):
 
 
 def visualize_ellipse(ellipse_canonical, img, transform=None):
+    for par in ellipse_canonical:
+        if np.isnan(par):
+            print("Warning: visualize_ellipse() canonical parameter is nan")
+            return
     vis_img = img.copy()
     a, b, x, y, teta = ellipse_canonical
+    assert -0.5 * np.pi <= teta <= 0.5 * np.pi
     scale = 1.
     if transform is not None:
         scale = transform[0, 0]
@@ -70,22 +75,17 @@ def visualize_ellipse(ellipse_canonical, img, transform=None):
     ellipse_thickness = 2
     vis_img = cv2.ellipse(vis_img, (center_x, center_y), (axis_a, axis_b), teta_degrees, start_angle, stop_angle,
                           ellipse_color, ellipse_thickness)
-    a_axis_start = (
-        int(center_x - axis_a * np.cos(teta)),
-        int(center_y + axis_a * np.sin(teta))
-    )
-    a_axis_stop = (
-        int(center_x + axis_a * np.cos(teta)),
-        int(center_y - axis_a * np.sin(teta))
-    )
-    vis_img = cv2.line(vis_img, a_axis_start, a_axis_stop, (0, 255, 0), 1)
-    b_axis_start = (
-        int(center_x - axis_b * np.sin(teta)),
-        int(center_y - axis_b * np.cos(teta))
-    )
-    b_axis_stop = (
-        int(center_x + axis_b * np.sin(teta)),
-        int(center_y + axis_b * np.cos(teta))
-    )
-    vis_img = cv2.line(vis_img, b_axis_start, b_axis_stop, (255, 0, 0), 1)
+
+    rotate_matrix = cv2.getRotationMatrix2D(center=(center_x, center_y), angle=teta_degrees, scale=1.)
+    a_line = np.asarray([[center_x - axis_a, center_y, 1], [center_x + axis_a, center_y, 1]])
+    b_line = np.asarray([[center_x, center_y - axis_b, 1], [center_x, center_y + axis_b, 1]])
+    a_rotated = np.dot(rotate_matrix, a_line.T).T
+    b_rotated = np.dot(rotate_matrix, b_line.T).T
+
+    a_axis_begin = (int(a_rotated[0, 0]), int(a_rotated[0, 1]))
+    a_axis_end = (int(a_rotated[1, 0]), int(a_rotated[1, 1]))
+    b_axis_begin = (int(b_rotated[0, 0]), int(b_rotated[0, 1]))
+    b_axis_end = (int(b_rotated[1, 0]), int(b_rotated[1, 1]))
+    vis_img = cv2.line(vis_img, a_axis_begin, a_axis_end, (0, 255, 0), 1)
+    vis_img = cv2.line(vis_img, b_axis_begin, b_axis_end, (255, 0, 0), 1)
     return vis_img

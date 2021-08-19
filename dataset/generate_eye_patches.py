@@ -36,7 +36,11 @@ def draw_eyes(in_frame, eyes, color=(0, 255, 0), width=2):
 
 
 def run_eye_patches_generation(args):
-    assert isfile(args.source), f"Source video file doesn't exist: {args.source}"
+    assert isinstance(args.source, str)
+    if args.source.isnumeric():
+        args.source = int(args.source)
+    else:
+        assert isfile(args.source), f"Source video file doesn't exist: {args.source}"
     cap = cv2.VideoCapture(args.source)
     eye_detector = HaarEyeDetector()
     face_detector = HaarFaceDetector()

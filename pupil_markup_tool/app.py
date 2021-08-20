@@ -18,6 +18,7 @@ import sys
 
 from pupil_markup import Ui_Dialog
 from utils.ellipse import solve_ellipse_equation, ellipse_equation_to_canonical, visualize_ellipse
+from utils.pose_estimation import find_normal, normal2angles
 
 
 class Markup:
@@ -81,12 +82,17 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
             canonical = ellipse_equation_to_canonical(equation)
             if canonical is not None:
                 a, b, x, y, teta = canonical
+                yaw, pitch = normal2angles(find_normal(canonical))
                 self.label_center_x.setText("{:.2f}".format(x))
                 self.label_center_y.setText("{:.2f}".format(y))
                 self.label_semi_a.setText("{:.2f}".format(a))
                 self.label_semi_b.setText("{:.2f}".format(b))
                 self.label_teta.setText("{:.2f}".format(teta * 180. / np.pi))
-                self.markup.visualization = visualize_ellipse(canonical, self.markup.visualization, self.markup.transform)
+                self.label_yaw.setText("{:.2f}".format(yaw))
+                self.label_pitch.setText("{:.2f}".format(pitch))
+                self.markup.visualization = visualize_ellipse(canonical, self.markup.visualization,
+                                                              self.markup.transform)
+
         for x, y in points:
             self.markup.visualization = cv2.circle(self.markup.visualization, (int(x * scale), int(y * scale)), 5, (0, 255, 255), 3)
         rgb_image = cv2.cvtColor(self.markup.visualization, cv2.COLOR_BGR2RGB)

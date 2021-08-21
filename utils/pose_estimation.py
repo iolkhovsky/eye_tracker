@@ -6,20 +6,29 @@ def find_normal(ellipse_canonical):
     a_axis, b_axis, x, y, teta = ellipse_canonical
     # x right, y up, z us
     if a_axis > b_axis:
-        minor_axis_angle = np.arccos(b_axis / a_axis)
+        major_vector = np.asarray([
+            a_axis * np.cos(teta), a_axis * np.sin(teta), 0.
+        ])
+        minor_axis_x = b_axis * np.sin(teta)
+        minor_axis_y = b_axis * np.cos(teta)
+        minor_axis_z = np.sqrt(a_axis ** 2 - minor_axis_x ** 2 - minor_axis_y ** 2)
+        minor_vector = np.asarray([
+            minor_axis_x, minor_axis_y, minor_axis_z
+        ])
     else:
-        minor_axis_angle = np.arccos(a_axis / b_axis)
-    major_vector = np.asarray([
-        a_axis * np.cos(teta), a_axis * np.sin(teta), 0.
-    ])
-    minor_vector = np.asarray([
-        b_axis * np.sin(teta), b_axis * np.cos(teta), a_axis * np.sin(minor_axis_angle)
-    ])
+        major_vector = np.asarray([
+            -1. * b_axis * np.sin(teta), b_axis * np.cos(teta), 0.
+        ])
+        minor_axis_x = a_axis * np.cos(teta)
+        minor_axis_y = b_axis * np.sin(teta)
+        minor_axis_z = np.sqrt(b_axis ** 2 - minor_axis_x ** 2 - minor_axis_y ** 2)
+        minor_vector = np.asarray([
+            minor_axis_x, minor_axis_y, minor_axis_z
+        ])
     circle_normal = np.cross(major_vector, minor_vector)
-    if circle_normal[2] < 0:
-        circle_normal *= -1.
-    norm = circle_normal / np.linalg.norm(circle_normal)
-    return norm
+    normal = circle_normal / np.linalg.norm(circle_normal)
+    normal *= np.sign(normal[2])
+    return normal
 
 
 def normal2angles(normal):
@@ -29,10 +38,3 @@ def normal2angles(normal):
     yaw = np.abs(np.arcsin(x))
     pitch = np.abs(np.arcsin(y))
     return 180. * yaw / np.pi, 180. * pitch / np.pi
-
-
-canonical = np.asarray([35.40, 30.53, 12.05, 13.07, 54.09 * np.pi / 180.])
-normal = find_normal(canonical)
-print(f"Normal: {normal}")
-x_angle, y_angle = normal2angles(normal)
-print((f"Angles: {x_angle}, {y_angle}"))

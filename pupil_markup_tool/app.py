@@ -14,10 +14,12 @@ if sys.platform.startswith("linux") and ci_and_not_headless:
     os.environ.pop("QT_QPA_FONTDIR")
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from os.path import basename, dirname, isfile, join, splitext
 import sys
 
 from pupil_markup import Ui_Dialog
 from utils.ellipse import solve_ellipse_equation, ellipse_equation_to_canonical, visualize_ellipse
+from utils.file_utils import write_yaml, read_yaml
 from utils.pose_estimation import find_normal, normal2angles
 
 
@@ -38,10 +40,13 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
         self.setupUi(self)
         self.pushButtonOpenImage.clicked.connect(self.open_image_clicked)
         self.labelImage.mousePressEvent = self.label_image_mouse_pressed
+        self.pushButtonSaveMarkup.clicked.connect(self.save_markup_clicked)
 
         self.markup = Markup()
         self.selected_points = []
         self.points_max_cnt = 6
+        self.equation = None
+        self.canonical = None
 
     def set_source_image(self, cv_image):
         self.markup.src_image = cv_image.copy()
@@ -72,17 +77,25 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
     def update_image(self, points=[]):
         self.markup.visualization = self.markup.image.copy()
         scale = self.markup.transform[0, 0]
+        self.labelEllipseEquation.clear()
+        self.label_semi_a.clear()
+        self.label_semi_b.clear()
+        self.label_center_x.clear()
+        self.label_center_y.clear()
+        self.label_teta.clear()
+        self.label_yaw.clear()
+        self.label_pitch.clear()
         if len(points) >= self.points_max_cnt:
-            equation = solve_ellipse_equation(points)
-            if equation is not None:
-                a, b, c, d, e, f = equation
+            self.equation = solve_ellipse_equation(points)
+            if self.equation is not None:
+                a, b, c, d, e, f = self.equation
                 self.labelEllipseEquation.setText(f"{'{:.3f}'.format(a)}x2 + {'{:.3f}'.format(b)}xy + "
                                                   f"{'{:.3f}'.format(c)}y2 + {'{:.3f}'.format(d)}x + "
                                                   f"{'{:.3f}'.format(e)}y + {'{:.3f}'.format(f)} = 0")
-            canonical = ellipse_equation_to_canonical(equation)
-            if canonical is not None:
-                a, b, x, y, teta = canonical
-                yaw, pitch = normal2angles(find_normal(canonical))
+            self.canonical = ellipse_equation_to_canonical(self.equation)
+            if self.canonical is not None:
+                a, b, x, y, teta = self.canonical
+                yaw, pitch = normal2angles(find_normal(self.canonical))
                 self.label_center_x.setText("{:.2f}".format(x))
                 self.label_center_y.setText("{:.2f}".format(y))
                 self.label_semi_a.setText("{:.2f}".format(a))
@@ -90,7 +103,7 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
                 self.label_teta.setText("{:.2f}".format(teta * 180. / np.pi))
                 self.label_yaw.setText("{:.2f}".format(yaw))
                 self.label_pitch.setText("{:.2f}".format(pitch))
-                vis_img = visualize_ellipse(canonical, self.markup.visualization, self.markup.transform)
+                vis_img = visualize_ellipse(self.canonical, self.markup.visualization, self.markup.transform)
                 if vis_img is not None:
                     self.markup.visualization = vis_img
 
@@ -111,8 +124,15 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
                                                         filter="Images (*.png), *.bmp, *.jpg",
                                                         options=QtWidgets.QFileDialog.DontUseNativeDialog)
         self.labelSourceImagePath.setText(path)
+        markup_path = f"{splitext(path)[0]}.yml"
+        self.labelOutputMarkupPath.setText(markup_path)
         self.set_source_image(cv2.imread(path))
-        self.update_image()
+        if isfile(markup_path):
+            data = read_yaml(markup_path)
+            self.selected_points = data["markup"]["keypoints"]
+            self.update_image(self.selected_points)
+        else:
+            self.update_image()
 
     def label_image_mouse_pressed(self, event: QtGui.QMouseEvent):
         widget_coord = np.asarray([[event.x(), event.y()]])
@@ -121,6 +141,28 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
         if len(self.selected_points) > self.points_max_cnt:
             self.selected_points.pop(0)
         self.update_image(self.selected_points)
+
+    def save_markup_clicked(self):
+        target_path = self.labelOutputMarkupPath.text()
+        a, b, c, d, e, f = self.equation
+        a_axis, b_axis, x, y, teta = self.canonical
+        data = {
+            "hint": "pupil_markup",
+            "source_image_path": self.labelSourceImagePath.text(),
+            "image_width": self.markup.src_image.shape[1],
+            "image_height": self.markup.src_image.shape[0],
+            "image_channels": self.markup.src_image.shape[2],
+            "markup": {
+                "keypoints": [(float(x), float(y)) for x, y in self.selected_points],
+                "equation": {
+                    "a": float(a), "b": float(b), "c": float(c), "d": float(d), "e": float(e), "f": float(f),
+                },
+                "canonical": {
+                    "a": float(a_axis), "b": float(b_axis), "x": float(x), "y": float(y), "teta": float(teta)
+                }
+            }
+        }
+        write_yaml(target_path, data)
 
 
 if __name__ == "__main__":

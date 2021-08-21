@@ -90,8 +90,9 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
                 self.label_teta.setText("{:.2f}".format(teta * 180. / np.pi))
                 self.label_yaw.setText("{:.2f}".format(yaw))
                 self.label_pitch.setText("{:.2f}".format(pitch))
-                self.markup.visualization = visualize_ellipse(canonical, self.markup.visualization,
-                                                              self.markup.transform)
+                vis_img = visualize_ellipse(canonical, self.markup.visualization, self.markup.transform)
+                if vis_img is not None:
+                    self.markup.visualization = vis_img
 
         for x, y in points:
             self.markup.visualization = cv2.circle(self.markup.visualization, (int(x * scale), int(y * scale)), 5, (0, 255, 255), 3)

@@ -22,10 +22,10 @@ def solve_ellipse_equation(points):
         assert sorted_s[0] * 100 < sorted_s[1] and abs(sorted_s[0] - sorted_s[1]) > 1e-9
         return v_transpose[vector_id]
     except np.linalg.LinAlgError:
-        print("solve_ellipse_equation: Error during SVD computation")
+        print("solve_ellipse_equation(): Error during SVD computation")
         return None
     except AssertionError:
-        print("solve_ellipse_equation: sigma matrix has more than one zero diagonal element")
+        print("solve_ellipse_equation(): Sigma matrix has more than one zero diagonal element")
         return None
 
 
@@ -53,6 +53,12 @@ def ellipse_equation_to_canonical(equation):
             ((a + c) - ((a - c) ** 2 + b ** 2) ** 0.5)
     ) ** 0.5
     b_axis = num / denum
+    if teta > np.pi / 4:
+        a_axis, b_axis = b_axis, a_axis
+        teta = teta - np.pi / 2
+    elif teta < -1. * np.pi / 4:
+        a_axis, b_axis = b_axis, a_axis
+        teta = teta + np.pi / 2
     return a_axis, b_axis, x, y, teta
 
 
@@ -60,7 +66,7 @@ def visualize_ellipse(ellipse_canonical, img, transform=None):
     for par in ellipse_canonical:
         if np.isnan(par):
             print("Warning: visualize_ellipse() canonical parameter is nan")
-            return
+            return None
     vis_img = img.copy()
     a, b, x, y, teta = ellipse_canonical
     assert -0.5 * np.pi <= teta <= 0.5 * np.pi

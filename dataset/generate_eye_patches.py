@@ -8,7 +8,7 @@ from utils.haar_detector import HaarEyeDetector, HaarFaceDetector
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Haar eye detector demo script")
+    parser = argparse.ArgumentParser(description="Eye patches generator")
     parser.add_argument("--source",
                         help="Absolute path to source videofile",
                         type=str)

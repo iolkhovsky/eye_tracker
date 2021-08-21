@@ -136,6 +136,7 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
         self.labelOutputMarkupPath.setText(markup_path)
         self.set_source_image(cv2.imread(path))
         self.selected_points.clear()
+        self.checkBoxPupil.setCheckState(True)
         if isfile(markup_path):
             data = read_yaml(markup_path)
             if data is not None:
@@ -154,8 +155,8 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
 
     def save_markup_clicked(self):
         target_path = self.labelOutputMarkupPath.text()
-        a, b, c, d, e, f = self.equation
-        a_axis, b_axis, x, y, teta = self.canonical
+        a, b, c, d, e, f = self.equation if self.equation is not None else (0, 0, 0, 0, 0, 0)
+        a_axis, b_axis, x, y, teta = self.canonical if self.canonical is not None else (0, 0, 0, 0, 0)
         data = {
             "hint": "pupil_markup",
             "source_image_path": self.labelSourceImagePath.text(),
@@ -163,6 +164,7 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
             "image_height": self.markup.src_image.shape[0],
             "image_channels": self.markup.src_image.shape[2],
             "markup": {
+                "pupil": 1 if self.checkBoxPupil.checkState() else 0,
                 "keypoints": [(float(x), float(y)) for x, y in self.selected_points],
                 "equation": {
                     "a": float(a), "b": float(b), "c": float(c), "d": float(d), "e": float(e), "f": float(f),

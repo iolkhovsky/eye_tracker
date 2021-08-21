@@ -1,6 +1,8 @@
 import cv2
+from glob import glob
 import numpy as np
-import os, sys
+import os
+import sys
 
 ci_build_and_not_headless = False
 try:
@@ -15,7 +17,6 @@ if sys.platform.startswith("linux") and ci_and_not_headless:
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from os.path import basename, dirname, isfile, join, splitext
-import sys
 
 from pupil_markup import Ui_Dialog
 from utils.ellipse import solve_ellipse_equation, ellipse_equation_to_canonical, visualize_ellipse
@@ -41,6 +42,7 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
         self.pushButtonOpenImage.clicked.connect(self.open_image_clicked)
         self.labelImage.mousePressEvent = self.label_image_mouse_pressed
         self.pushButtonSaveMarkup.clicked.connect(self.save_markup_clicked)
+        self.listWidgetAvailableImages.itemDoubleClicked.connect(self.images_list_clicked)
 
         self.markup = Markup()
         self.selected_points = []
@@ -123,6 +125,12 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
         path, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Open image to markup", directory="/home/igor",
                                                         filter="Images (*.png), *.bmp, *.jpg",
                                                         options=QtWidgets.QFileDialog.DontUseNativeDialog)
+        parent_folder = dirname(path)
+        imgs_list = glob(join(parent_folder, "*.jpg"))
+        self.listWidgetAvailableImages.addItems(imgs_list)
+        self.open_file(path)
+
+    def open_file(self, path):
         self.labelSourceImagePath.setText(path)
         markup_path = f"{splitext(path)[0]}.yml"
         self.labelOutputMarkupPath.setText(markup_path)
@@ -142,9 +150,6 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
             closest_point_idx = np.argmin(distance_to_points)
             self.selected_points = [p for idx, p in enumerate(self.selected_points) if idx != closest_point_idx]
         self.selected_points.append((x, y))
-        # self.selected_points.append((x, y))
-        # if len(self.selected_points) > self.points_max_cnt:
-        #     self.selected_points.pop(0)
         self.update_image(self.selected_points)
 
     def save_markup_clicked(self):
@@ -168,6 +173,9 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
             }
         }
         write_yaml(target_path, data)
+
+    def images_list_clicked(self, item):
+        self.open_file(item.text())
 
 
 if __name__ == "__main__":

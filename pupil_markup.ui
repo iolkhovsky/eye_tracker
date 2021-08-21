@@ -52,16 +52,6 @@
     </property>
    </widget>
   </widget>
-  <widget class="QListView" name="listViewSelectedPoints">
-   <property name="geometry">
-    <rect>
-     <x>570</x>
-     <y>120</y>
-     <width>200</width>
-     <height>200</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QLabel" name="labelEllipseEquation">
    <property name="geometry">
     <rect>
@@ -333,6 +323,16 @@
    </property>
    <property name="text">
     <string>Yaw (X, deg)</string>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="listWidgetAvailableImages">
+   <property name="geometry">
+    <rect>
+     <x>570</x>
+     <y>120</y>
+     <width>201</width>
+     <height>192</height>
+    </rect>
    </property>
   </widget>
  </widget>

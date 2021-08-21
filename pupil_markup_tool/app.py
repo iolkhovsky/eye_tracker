@@ -127,19 +127,24 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
         markup_path = f"{splitext(path)[0]}.yml"
         self.labelOutputMarkupPath.setText(markup_path)
         self.set_source_image(cv2.imread(path))
+        self.selected_points.clear()
         if isfile(markup_path):
             data = read_yaml(markup_path)
-            self.selected_points = data["markup"]["keypoints"]
-            self.update_image(self.selected_points)
-        else:
-            self.update_image()
+            if data is not None:
+                self.selected_points = data["markup"]["keypoints"]
+        self.update_image(self.selected_points)
 
     def label_image_mouse_pressed(self, event: QtGui.QMouseEvent):
         widget_coord = np.asarray([[event.x(), event.y()]])
         x, y = np.dot(widget_coord, self.markup.inv_transform)[0][:2]
+        if len(self.selected_points) == self.points_max_cnt:
+            distance_to_points = [np.linalg.norm((x - px, y - py)) for px, py in self.selected_points]
+            closest_point_idx = np.argmin(distance_to_points)
+            self.selected_points = [p for idx, p in enumerate(self.selected_points) if idx != closest_point_idx]
         self.selected_points.append((x, y))
-        if len(self.selected_points) > self.points_max_cnt:
-            self.selected_points.pop(0)
+        # self.selected_points.append((x, y))
+        # if len(self.selected_points) > self.points_max_cnt:
+        #     self.selected_points.pop(0)
         self.update_image(self.selected_points)
 
     def save_markup_clicked(self):

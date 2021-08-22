@@ -5,7 +5,7 @@ from random import shuffle
 import tensorflow as tf
 from tqdm import tqdm
 
-from dataset.tfrecord_utils import *
+from dataset.tfrecord_utils import float_feature, int64_feature, bytes_feature
 from utils.file_utils import read_yaml
 
 

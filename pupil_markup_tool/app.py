@@ -19,9 +19,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from os.path import basename, dirname, isfile, join, splitext
 
 from pupil_markup import Ui_Dialog
-from utils.ellipse import solve_ellipse_equation, ellipse_equation_to_canonical, visualize_ellipse
+from utils.ellipse import ellipse_equation_to_canonical, find_normal, normal2angles, solve_ellipse_equation
+from utils.ellipse import visualize_ellipse
 from utils.file_utils import write_yaml, read_yaml
-from utils.pose_estimation import find_normal, normal2angles
 
 
 class Markup:

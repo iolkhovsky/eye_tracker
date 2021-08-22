@@ -1,7 +1,7 @@
 import argparse
 import cv2
 from os import makedirs
-from os.path import isdir, isfile, join
+from os.path import basename, isdir, isfile, join, splitext
 from shutil import rmtree
 
 from utils.haar_detector import HaarEyeDetector, HaarFaceDetector
@@ -39,8 +39,10 @@ def run_eye_patches_generation(args):
     assert isinstance(args.source, str)
     if args.source.isnumeric():
         args.source = int(args.source)
+        filename = f"webcamera_{args.source}"
     else:
         assert isfile(args.source), f"Source video file doesn't exist: {args.source}"
+        filename = splitext(basename(args.source))[0]
     cap = cv2.VideoCapture(args.source)
     eye_detector = HaarEyeDetector()
     face_detector = HaarFaceDetector()
@@ -62,7 +64,7 @@ def run_eye_patches_generation(args):
             for ex, ey, ew, eh in eyes:
                 patch = face_subframe[ey:ey+eh, ex:ex+ew, :]
                 patch = cv2.resize(patch, (args.patch_size, args.patch_size))
-                patch_path = join(args.output, f"{patch_idx}.{args.patch_format}")
+                patch_path = join(args.output, f"{filename}_{patch_idx}.{args.patch_format}")
                 cv2.imwrite(patch_path, patch)
                 print(f"{patch_idx}: Generated patch: {patch_path}")
                 patch_idx += 1

@@ -1,0 +1,21 @@
+dataset:
+  train:
+    tfrecords:
+      - path_to_dataset.tfrecord
+    batch_size: 64
+  val:
+    tfrecords:
+      - path_to_dataset.tfrecord
+    batch_size: 32
+model:
+  pretrained:
+    enable: 0
+    path: path_to_model.ckpt
+  feature_extractor: MobileNetV2
+  dropout: 0.5
+training:
+  optimizer: adam
+  lr: 1e-4
+  loss_weights:
+    regression: 1.
+    classification: 1.

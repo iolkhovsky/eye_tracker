@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>680</height>
+    <width>1024</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,9 +30,9 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>100</y>
-     <width>540</width>
-     <height>540</height>
+     <y>70</y>
+     <width>720</width>
+     <height>720</height>
     </rect>
    </property>
    <property name="title">
@@ -43,8 +43,8 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>500</width>
-      <height>500</height>
+      <width>670</width>
+      <height>670</height>
      </rect>
     </property>
     <property name="text">
@@ -55,8 +55,8 @@
   <widget class="QLabel" name="labelEllipseEquation">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>70</y>
+     <x>550</x>
+     <y>40</y>
      <width>450</width>
      <height>20</height>
     </rect>
@@ -68,8 +68,8 @@
   <widget class="QLabel" name="labelEllipseEquationText">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>70</y>
+     <x>550</x>
+     <y>10</y>
      <width>110</width>
      <height>20</height>
     </rect>
@@ -120,9 +120,9 @@
   <widget class="QPushButton" name="pushButtonSaveMarkup">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>590</y>
-     <width>201</width>
+     <x>750</x>
+     <y>730</y>
+     <width>261</width>
      <height>51</height>
     </rect>
    </property>
@@ -133,8 +133,8 @@
   <widget class="QLabel" name="label_center_x_text">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>390</y>
+     <x>760</x>
+     <y>90</y>
      <width>67</width>
      <height>17</height>
     </rect>
@@ -146,8 +146,8 @@
   <widget class="QLabel" name="label_center_y_text">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>410</y>
+     <x>760</x>
+     <y>110</y>
      <width>67</width>
      <height>17</height>
     </rect>
@@ -159,8 +159,8 @@
   <widget class="QLabel" name="label_semi_a_text">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>430</y>
+     <x>760</x>
+     <y>130</y>
      <width>91</width>
      <height>17</height>
     </rect>
@@ -172,8 +172,8 @@
   <widget class="QLabel" name="label_semi_b_text">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>450</y>
+     <x>760</x>
+     <y>150</y>
      <width>91</width>
      <height>17</height>
     </rect>
@@ -185,8 +185,8 @@
   <widget class="QLabel" name="label_teta_text">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>470</y>
+     <x>760</x>
+     <y>170</y>
      <width>91</width>
      <height>17</height>
     </rect>
@@ -198,8 +198,8 @@
   <widget class="QLabel" name="label_center_x">
    <property name="geometry">
     <rect>
-     <x>680</x>
-     <y>390</y>
+     <x>870</x>
+     <y>90</y>
      <width>67</width>
      <height>17</height>
     </rect>
@@ -211,8 +211,8 @@
   <widget class="QLabel" name="label_center_y">
    <property name="geometry">
     <rect>
-     <x>680</x>
-     <y>410</y>
+     <x>870</x>
+     <y>110</y>
      <width>67</width>
      <height>17</height>
     </rect>
@@ -224,8 +224,8 @@
   <widget class="QLabel" name="label_semi_a">
    <property name="geometry">
     <rect>
-     <x>680</x>
-     <y>430</y>
+     <x>870</x>
+     <y>130</y>
      <width>91</width>
      <height>17</height>
     </rect>
@@ -237,8 +237,8 @@
   <widget class="QLabel" name="label_semi_b">
    <property name="geometry">
     <rect>
-     <x>680</x>
-     <y>450</y>
+     <x>870</x>
+     <y>150</y>
      <width>91</width>
      <height>17</height>
     </rect>
@@ -250,8 +250,8 @@
   <widget class="QLabel" name="label_teta">
    <property name="geometry">
     <rect>
-     <x>680</x>
-     <y>470</y>
+     <x>870</x>
+     <y>170</y>
      <width>91</width>
      <height>17</height>
     </rect>
@@ -260,24 +260,11 @@
     <string>--/--</string>
    </property>
   </widget>
-  <widget class="Line" name="line">
-   <property name="geometry">
-    <rect>
-     <x>570</x>
-     <y>500</y>
-     <width>191</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_yaw">
    <property name="geometry">
     <rect>
-     <x>680</x>
-     <y>520</y>
+     <x>860</x>
+     <y>650</y>
      <width>67</width>
      <height>17</height>
     </rect>
@@ -289,8 +276,8 @@
   <widget class="QLabel" name="label_pitch">
    <property name="geometry">
     <rect>
-     <x>680</x>
-     <y>540</y>
+     <x>860</x>
+     <y>670</y>
      <width>67</width>
      <height>17</height>
     </rect>
@@ -302,8 +289,8 @@
   <widget class="QLabel" name="label_pitch_text">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>540</y>
+     <x>750</x>
+     <y>670</y>
      <width>101</width>
      <height>17</height>
     </rect>
@@ -315,8 +302,8 @@
   <widget class="QLabel" name="label_yaw_text">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>520</y>
+     <x>750</x>
+     <y>650</y>
      <width>91</width>
      <height>17</height>
     </rect>
@@ -328,24 +315,37 @@
   <widget class="QListWidget" name="listWidgetAvailableImages">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>120</y>
-     <width>201</width>
-     <height>192</height>
+     <x>750</x>
+     <y>200</y>
+     <width>261</width>
+     <height>441</height>
     </rect>
    </property>
   </widget>
   <widget class="QCheckBox" name="checkBoxPupil">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>340</y>
+     <x>750</x>
+     <y>700</y>
      <width>92</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
     <string>Pupil</string>
+   </property>
+  </widget>
+  <widget class="Line" name="line">
+   <property name="geometry">
+    <rect>
+     <x>540</x>
+     <y>10</y>
+     <width>3</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Vertical</enum>
    </property>
   </widget>
  </widget>

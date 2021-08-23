@@ -1,19 +1,22 @@
 dataset:
   train:
     tfrecords:
-      - path_to_dataset.tfrecord
+      - /home/igor/datasets/eye_tracker/tfrecords/pupil_train.tfrecord
     batch_size: 64
   val:
     tfrecords:
-      - path_to_dataset.tfrecord
+      - /home/igor/datasets/eye_tracker/tfrecords/pupil_val.tfrecord
     batch_size: 32
 model:
+  input_size: 64
   pretrained:
     enable: 0
     path: path_to_model.ckpt
   feature_extractor: MobileNetV2
   dropout: 0.5
 training:
+  logs_path: logs
+  checkpoints_path: checkpoints
   optimizer: adam
   lr: 1e-4
   loss_weights:

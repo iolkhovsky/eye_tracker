@@ -4,7 +4,7 @@ from os import makedirs
 from os.path import basename, isdir, isfile, join, splitext
 from shutil import rmtree
 
-from utils.haar_detector import HaarEyeDetector, HaarFaceDetector
+from common_utils.haar_detector import HaarEyeDetector, HaarFaceDetector
 
 
 def parse_args():

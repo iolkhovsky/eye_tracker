@@ -6,7 +6,7 @@ from os.path import isdir, join
 import sys
 from tqdm import tqdm
 
-from utils.file_utils import write_yaml
+from common_utils.file_utils import write_yaml
 
 
 def parse_args():

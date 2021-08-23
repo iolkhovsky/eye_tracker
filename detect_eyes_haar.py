@@ -2,7 +2,7 @@ import argparse
 import cv2
 import numpy as np
 
-from utils.haar_detector import HaarEyeDetector, HaarFaceDetector
+from common_utils.haar_detector import HaarEyeDetector, HaarFaceDetector
 
 
 WEBCAM_SOURCE = "webcam"

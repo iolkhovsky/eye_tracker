@@ -6,7 +6,7 @@ from os.path import basename, isdir, isfile, join
 from shutil import rmtree
 import tensorflow as tf
 
-from utils.ellipse import visualize_ellipse
+from common_utils.ellipse import visualize_ellipse
 
 
 def parse_args():

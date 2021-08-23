@@ -6,7 +6,7 @@ import tensorflow as tf
 from tqdm import tqdm
 
 from dataset.tfrecord_utils import float_feature, int64_feature, bytes_feature
-from utils.file_utils import read_yaml
+from common_utils.file_utils import read_yaml
 
 
 def create_tf_example(annotation):

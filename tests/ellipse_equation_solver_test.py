@@ -4,7 +4,7 @@ from os import makedirs
 from os.path import isdir, join
 import pytest
 
-from utils.ellipse import solve_ellipse_equation, ellipse_equation_to_canonical
+from common_utils.ellipse import solve_ellipse_equation, ellipse_equation_to_canonical
 
 
 TEST_OUTPUT_DIR = "test_output"

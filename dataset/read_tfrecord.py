@@ -7,7 +7,7 @@ from shutil import rmtree
 import tensorflow as tf
 
 from common_utils.ellipse import visualize_ellipse
-
+from dataset.tfrecord_utils import decode_fn
 
 def parse_args():
     parser = argparse.ArgumentParser(description="TFRecord validation tool")
@@ -18,31 +18,6 @@ def parse_args():
     parser.add_argument("--img_size", type=int, default=640,
                         help="Exported images size")
     return parser.parse_args()
-
-
-def decode_fn(record_bytes):
-    return tf.io.parse_single_example(
-        record_bytes,
-        features={
-            'image/height': tf.io.FixedLenFeature([], tf.int64),
-            'image/width': tf.io.FixedLenFeature([], tf.int64),
-            'image/depth': tf.io.FixedLenFeature([], tf.int64),
-            'image/filename': tf.io.FixedLenFeature([], tf.string),
-            'image/encoded': tf.io.FixedLenFeature([], tf.string),
-            "pupil": tf.io.FixedLenFeature([], tf.int64),
-            "equation/a": tf.io.FixedLenFeature([], tf.float32),
-            "equation/b": tf.io.FixedLenFeature([], tf.float32),
-            "equation/c": tf.io.FixedLenFeature([], tf.float32),
-            "equation/d": tf.io.FixedLenFeature([], tf.float32),
-            "equation/e": tf.io.FixedLenFeature([], tf.float32),
-            "equation/f": tf.io.FixedLenFeature([], tf.float32),
-            "canonical/a": tf.io.FixedLenFeature([], tf.float32),
-            "canonical/b": tf.io.FixedLenFeature([], tf.float32),
-            "canonical/x": tf.io.FixedLenFeature([], tf.float32),
-            "canonical/y": tf.io.FixedLenFeature([], tf.float32),
-            "canonical/t": tf.io.FixedLenFeature([], tf.float32),
-        }
-    )
 
 
 def run_extraction(args):

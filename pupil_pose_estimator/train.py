@@ -1,5 +1,5 @@
 import argparse
-from os.path import isfile
+from os.path import isfile, join
 import tensorflow as tf
 
 from common_utils.file_utils import read_yaml
@@ -49,7 +49,7 @@ def run_training(args):
     epochs = config["training"]["epochs"]
 
     callbacks = [
-        tf.keras.callbacks.ModelCheckpoint("epoch_{epoch}_ckpt"),
+        tf.keras.callbacks.ModelCheckpoint(join(config["training"]["checkpoints_path"], "ep{epoch}_ckpt")),
         tf.keras.callbacks.TensorBoard(log_dir=config["training"]["logs_path"])
     ]
     model.compile(

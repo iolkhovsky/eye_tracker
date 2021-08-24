@@ -2,8 +2,10 @@ import argparse
 from os.path import isfile
 import tensorflow as tf
 
-from pupil_pose_estimator.model import PupilPoseEstimator
 from common_utils.file_utils import read_yaml
+from dataset.label_encoder import LabelEncoder
+from pupil_pose_estimator.model import PupilPoseEstimator
+from pupil_pose_estimator.loss import PupilEstimatorLoss
 
 
 def parse_args():
@@ -33,6 +35,30 @@ def run_training(args):
     model = build_model(config)
     model.build(input_shape=(None, config["model"]["input_size"], config["model"]["input_size"], 3))
     model.summary()
+
+    loss = PupilEstimatorLoss(class_w=config["training"]["loss_weights"]["classification"],
+                              regr_w=config["training"]["loss_weights"]["regression"])
+
+    normalizer = None  # TODO build_normalizer()
+    encoder = LabelEncoder(normalizer)
+    train_dataset = tf.data.TFRecordDataset(config["dataset"]["train"]["tfrecords"])
+    train_dataset = train_dataset.map(encoder).batch(config["dataset"]["train"]["batch_size"])
+    val_datset = tf.data.TFRecordDataset(config["dataset"]["val"]["tfrecords"])
+    val_datset = val_datset.map(encoder).batch(config["dataset"]["val"]["batch_size"])
+
+    epochs = config["training"]["epochs"]
+
+    callbacks = [
+        tf.keras.callbacks.ModelCheckpoint("epoch_{epoch}_ckpt"),
+        tf.keras.callbacks.TensorBoard(log_dir=config["training"]["logs_path"])
+    ]
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(1e-4),
+        loss=loss,
+    )
+    model.fit(
+        train_dataset, epochs=epochs, callbacks=callbacks, validation_data=val_datset,
+    )
 
 
 if __name__ == "__main__":

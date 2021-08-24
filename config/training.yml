@@ -15,6 +15,7 @@ model:
   feature_extractor: MobileNetV2
   dropout: 0.5
 training:
+  epochs: 10
   logs_path: logs
   checkpoints_path: checkpoints
   optimizer: adam

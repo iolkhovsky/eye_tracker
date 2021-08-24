@@ -32,3 +32,6 @@ class LabelEncoder:
             axis=0
         )
         return img, label
+
+    def __call__(self, *args, **kwargs):
+        return self.encode(*args, **kwargs)

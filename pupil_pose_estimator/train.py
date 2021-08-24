@@ -1,5 +1,7 @@
 import argparse
 from os.path import isfile, join
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
 
 from common_utils.file_utils import read_yaml

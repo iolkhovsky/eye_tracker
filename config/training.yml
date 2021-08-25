@@ -6,7 +6,7 @@ dataset:
   val:
     tfrecords:
       - /home/igor/datasets/eye_tracker/tfrecords/pupil_val.tfrecord
-    batch_size: 32
+    batch_size: 2
 model:
   input_size: 64
   pretrained:

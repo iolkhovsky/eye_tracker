@@ -23,14 +23,21 @@ class PupilPoseEstimator(tf.keras.Model):
         features = self.flatten(features)
         features = self.bn(features)
         features = self.do(features)
-        return self.dense(features)
+        features = self.dense(features)
+        return tf.concat(
+            (
+                tf.expand_dims(features[:, 0], axis=1),
+                self.spatial_act(features[:, 1:5]),
+                tf.expand_dims(self.angle_act(features[:, 5]), axis=1)
+            ),
+            axis=1
+        )
 
     def predict(self, image):
         prediction = self.call(image, training=False)
-        pupile_conf = self.clf_act(prediction[:, 0])
-        spatial_pars = self.spatial_act(prediction[:, 1:5])
-        angle = self.angle_act(prediction[:, 5])
+        logits, ellipse_pars = prediction[:, 0], prediction[:, 1:]
+        pupile_conf = self.clf_act(logits)
         return tf.concat(
-            (tf.expand_dims(pupile_conf, axis=1), spatial_pars, tf.expand_dims(angle, axis=1)),
+            (tf.expand_dims(pupile_conf, axis=1), ellipse_pars),
             axis=1
         )

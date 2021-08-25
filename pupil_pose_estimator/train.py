@@ -8,6 +8,7 @@ from common_utils.file_utils import read_yaml
 from dataset.label_encoder import LabelEncoder
 from pupil_pose_estimator.model import PupilPoseEstimator
 from pupil_pose_estimator.loss import PupilEstimatorLoss
+from pupil_pose_estimator.metrics import PupilClassificationMetric, PupilePoseEstimationQuality
 
 
 def parse_args():
@@ -38,9 +39,6 @@ def run_training(args):
     model.build(input_shape=(None, config["model"]["input_size"], config["model"]["input_size"], 3))
     model.summary()
 
-    loss = PupilEstimatorLoss(class_w=config["training"]["loss_weights"]["classification"],
-                              regr_w=config["training"]["loss_weights"]["regression"])
-
     normalizer = None  # TODO build_normalizer()
     encoder = LabelEncoder(normalizer)
     train_dataset = tf.data.TFRecordDataset(config["dataset"]["train"]["tfrecords"])
@@ -56,7 +54,11 @@ def run_training(args):
     ]
     model.compile(
         optimizer=tf.keras.optimizers.Adam(1e-4),
-        loss=loss,
+        loss=PupilEstimatorLoss(
+            class_w=config["training"]["loss_weights"]["classification"],
+            regr_w=config["training"]["loss_weights"]["regression"]
+        ),
+        metrics=[PupilClassificationMetric(), PupilePoseEstimationQuality()]
     )
     model.fit(
         train_dataset, epochs=epochs, callbacks=callbacks, validation_data=val_datset,

@@ -11,8 +11,8 @@ class PupilClassificationMetric(tf.keras.metrics.Metric):
         self._result = 0.
 
     def update_state(self, y_true, y_pred, sample_weight=None):
-        labels = y_true[:, 0]
-        preds = y_pred[:, 0]
+        labels = tf.cast(y_true[:, 0], dtype=tf.int64)
+        preds = tf.cast(y_pred[:, 0] > 0.5, dtype=tf.int64)
         self._accuracy.reset_state()
         self._accuracy.update_state(labels, preds)
         self._result = self._accuracy.result()

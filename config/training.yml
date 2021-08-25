@@ -2,7 +2,7 @@ dataset:
   train:
     tfrecords:
       - /home/igor/datasets/eye_tracker/tfrecords/pupil_train.tfrecord
-    batch_size: 64
+    batch_size: 32
   val:
     tfrecords:
       - /home/igor/datasets/eye_tracker/tfrecords/pupil_val.tfrecord
@@ -15,11 +15,11 @@ model:
   feature_extractor: MobileNetV2
   dropout: 0.5
 training:
-  epochs: 10
+  epochs: 100
   logs_path: logs
   checkpoints_path: checkpoints
   optimizer: adam
-  lr: 1e-4
+  lr: 1e-3
   loss_weights:
     regression: 1.
     classification: 1.

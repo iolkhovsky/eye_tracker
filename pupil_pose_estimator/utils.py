@@ -20,15 +20,20 @@ def decode_estimator_prediction(prediction):
     } for p in prediction]
 
 
-def visualize_pupil(tf_images, tf_labels, denormalizer=None):
+def visualize_pupil(tf_images, tf_labels, denormalizer=None, min_img_size=128):
     out = []
     if denormalizer is not None:
         tf_images = denormalizer(tf_images)
     for img, label in zip(tf_images, tf_labels):
         img = img.numpy().astype(np.uint8)
         img_size = img.shape[0]
+        vis_scale = min_img_size / img_size
+        transform = None
+        if vis_scale > 1.:
+            transform = np.asarray([[vis_scale, 0, 0], [0, vis_scale, 0]], dtype=np.float32)
+            img = cv2.resize(img, (min_img_size, min_img_size))
         prob, a, b, x, y, teta = label.numpy()
         canonical = a * img_size, b * img_size, x * img_size, y * img_size, teta * np.pi * 0.5
-        vis_img = visualize_ellipse(canonical, img)
+        vis_img = visualize_ellipse(canonical, img, transform)
         out.append(tf.convert_to_tensor(vis_img))
     return out

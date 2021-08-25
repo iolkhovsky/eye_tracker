@@ -57,12 +57,23 @@ def run_training(args):
     epochs = config["training"]["epochs"]
 
     def visualize_prediction(epoch, logs):
-        batch = next(iter(val_dataset))
-        val_imgs, val_labels = batch
+        val_imgs, val_labels = next(iter(val_dataset))
+        val_batch_size = len(val_imgs)
         val_preds = model.predict(val_imgs)
         target_visualization = visualize_pupil(val_imgs, val_labels, denormalizer)
         pred_visualization = visualize_pupil(val_imgs, val_preds, denormalizer)
-        writer = tf.summary.create_file_writer(join(logs_path, "visualization"))
+        writer = tf.summary.create_file_writer(join(logs_path, "visualization_val"))
+        with writer.as_default():
+            tf.summary.image("target", target_visualization, step=epoch)
+            tf.summary.image("prediction", pred_visualization, step=epoch)
+        train_imgs, train_labels = next(iter(train_dataset))
+        train_batch_size = len(train_imgs)
+        train_imgs, train_labels = train_imgs[:min(train_batch_size, val_batch_size)], \
+                                   train_labels[:min(train_batch_size, val_batch_size)]
+        train_preds = model.predict(train_imgs)
+        target_visualization = visualize_pupil(train_imgs, train_labels, denormalizer)
+        pred_visualization = visualize_pupil(train_imgs, train_preds, denormalizer)
+        writer = tf.summary.create_file_writer(join(logs_path, "visualization_train"))
         with writer.as_default():
             tf.summary.image("target", target_visualization, step=epoch)
             tf.summary.image("prediction", pred_visualization, step=epoch)

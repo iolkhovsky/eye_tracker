@@ -12,7 +12,7 @@ class PupilEstimatorLoss(tf.keras.losses.Loss):
         self.class_loss = tf.keras.losses.BinaryCrossentropy(from_logits=from_logits)
         self.regr_loss = tf.keras.losses.MeanSquaredError()
 
-    def compute(self, y_true, y_pred, sample_weight):
+    def compute(self, y_true, y_pred, sample_weight=None):
         pupil_true, ellipse_true = y_true[:, 0], y_true[:, 1:]
         pupil_pred, ellipse_pred = y_pred[:, 0], y_pred[:, 1:]
         clf_loss = self.class_loss(pupil_true, pupil_pred) * self.class_w

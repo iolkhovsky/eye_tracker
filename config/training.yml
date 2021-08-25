@@ -18,7 +18,7 @@ training:
   epochs: 100
   logs_path: logs
   checkpoints_path: checkpoints
-  optimizer: adam
+  optimizer: Adam
   lr: 1e-4
   loss_weights:
     regression: 1.

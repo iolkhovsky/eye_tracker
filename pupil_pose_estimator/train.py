@@ -72,8 +72,10 @@ def run_training(args):
         tf.keras.callbacks.TensorBoard(log_dir=logs_path),
         tf.keras.callbacks.LambdaCallback(on_epoch_end=visualize_prediction)
     ]
+    lr = float(config["training"]["lr"])
+    optimizer = getattr(tf.keras.optimizers, config["training"]["optimizer"])(lr)
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(float(config["training"]["lr"])),
+        optimizer=optimizer,
         loss=PupilEstimatorLoss(
             class_w=config["training"]["loss_weights"]["classification"],
             regr_w=config["training"]["loss_weights"]["regression"],

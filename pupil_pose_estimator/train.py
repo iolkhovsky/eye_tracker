@@ -64,8 +64,8 @@ def run_training(args):
         pred_visualization = visualize_pupil(val_imgs, val_preds, denormalizer)
         writer = tf.summary.create_file_writer(join(logs_path, "visualization_val"))
         with writer.as_default():
-            tf.summary.image("target", target_visualization, step=epoch)
-            tf.summary.image("prediction", pred_visualization, step=epoch)
+            tf.summary.image("target", target_visualization, step=epoch, max_outputs=val_batch_size)
+            tf.summary.image("prediction", pred_visualization, step=epoch, max_outputs=val_batch_size)
         train_imgs, train_labels = next(iter(train_dataset))
         train_batch_size = len(train_imgs)
         train_imgs, train_labels = train_imgs[:min(train_batch_size, val_batch_size)], \
@@ -75,8 +75,8 @@ def run_training(args):
         pred_visualization = visualize_pupil(train_imgs, train_preds, denormalizer)
         writer = tf.summary.create_file_writer(join(logs_path, "visualization_train"))
         with writer.as_default():
-            tf.summary.image("target", target_visualization, step=epoch)
-            tf.summary.image("prediction", pred_visualization, step=epoch)
+            tf.summary.image("target", target_visualization, step=epoch, max_outputs=train_batch_size)
+            tf.summary.image("prediction", pred_visualization, step=epoch, max_outputs=train_batch_size)
 
     callbacks = [
         tf.keras.callbacks.ModelCheckpoint(join(ckpt_path, "ep{epoch}_ckpt")),

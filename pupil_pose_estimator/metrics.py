@@ -36,4 +36,4 @@ class PupilePoseEstimationQuality(tf.keras.metrics.Metric):
         self._result = self._mse(target_values, pred_values)
 
     def result(self):
-        return self._result
+        return -1. * self._result

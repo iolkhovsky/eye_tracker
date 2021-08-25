@@ -19,7 +19,7 @@ training:
   logs_path: logs
   checkpoints_path: checkpoints
   optimizer: adam
-  lr: 1e-3
+  lr: 1e-4
   loss_weights:
     regression: 1.
-    classification: 1.
+    classification: 2.

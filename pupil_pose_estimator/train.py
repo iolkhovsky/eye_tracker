@@ -1,4 +1,5 @@
 import argparse
+import datetime
 from os.path import isfile, join
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -41,6 +42,10 @@ def run_training(args):
     model.build(input_shape=(None, config["model"]["input_size"], config["model"]["input_size"], 3))
     model.summary()
 
+    timestamp = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    logs_path = join(config["training"]["logs_path"], timestamp)
+    ckpt_path = join(config["training"]["checkpoints_path"], timestamp)
+
     normalizer = build_normalizer(config)
     denormalizer = build_denormalizer(config)
     encoder = LabelEncoder(normalizer)
@@ -57,18 +62,18 @@ def run_training(args):
         val_preds = model.predict(val_imgs)
         target_visualization = visualize_pupil(val_imgs, val_labels, denormalizer)
         pred_visualization = visualize_pupil(val_imgs, val_preds, denormalizer)
-        writer = tf.summary.create_file_writer("logs/visualization")
+        writer = tf.summary.create_file_writer(join(logs_path, "visualization"))
         with writer.as_default():
             tf.summary.image("target", target_visualization, step=epoch)
             tf.summary.image("prediction", pred_visualization, step=epoch)
 
     callbacks = [
-        tf.keras.callbacks.ModelCheckpoint(join(config["training"]["checkpoints_path"], "ep{epoch}_ckpt")),
-        tf.keras.callbacks.TensorBoard(log_dir=config["training"]["logs_path"]),
+        tf.keras.callbacks.ModelCheckpoint(join(ckpt_path, "ep{epoch}_ckpt")),
+        tf.keras.callbacks.TensorBoard(log_dir=logs_path),
         tf.keras.callbacks.LambdaCallback(on_epoch_end=visualize_prediction)
     ]
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(1e-4),
+        optimizer=tf.keras.optimizers.Adam(float(config["training"]["lr"])),
         loss=PupilEstimatorLoss(
             class_w=config["training"]["loss_weights"]["classification"],
             regr_w=config["training"]["loss_weights"]["regression"],

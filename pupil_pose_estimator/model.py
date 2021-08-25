@@ -16,7 +16,7 @@ class PupilPoseEstimator(tf.keras.Model):
         self.dense = tf.keras.layers.Dense(units=6)
         self.clf_act = tf.keras.layers.Activation(tf.nn.sigmoid)
         self.angle_act = tf.keras.layers.Activation(tf.nn.tanh)
-        self.spatial_act = tf.keras.layers.Activation(tf.math.exp)
+        self.spatial_act = tf.keras.layers.Activation(tf.nn.sigmoid)
 
     def call(self, image, training=False):
         features = self.backbone(image, training=training)

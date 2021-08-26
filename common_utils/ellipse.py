@@ -62,38 +62,44 @@ def ellipse_equation_to_canonical(equation):
     return a_axis, b_axis, x, y, teta
 
 
-def visualize_ellipse(ellipse_canonical, img, transform=None):
-    for par in ellipse_canonical:
-        if np.isnan(par):
-            print("Warning: visualize_ellipse() canonical parameter is nan")
-            return None
+def visualize_ellipse(ellipse_canonical, ellipse_flag, img, transform=None):
     vis_img = img.copy()
-    a, b, x, y, teta = ellipse_canonical
-    assert -0.5 * np.pi <= teta <= 0.5 * np.pi
-    scale = 1.
-    if transform is not None:
-        scale = transform[0, 0]
-    center_x, center_y = int(x * scale), int(y * scale)
-    axis_a, axis_b = int(a * scale), int(b * scale)
-    teta_degrees = teta * 180. / np.pi
-    start_angle, stop_angle = 0, 360
-    ellipse_color = (0, 0, 255)
-    ellipse_thickness = 2
-    vis_img = cv2.ellipse(vis_img, (center_x, center_y), (axis_a, axis_b), teta_degrees, start_angle, stop_angle,
-                          ellipse_color, ellipse_thickness)
+    if ellipse_flag:
+        for par in ellipse_canonical:
+            if np.isnan(par):
+                print("Warning: visualize_ellipse() canonical parameter is nan")
+                return None
+        a, b, x, y, teta = ellipse_canonical
+        ok = True
+        for par in [a, b, x, y]:
+            if par <= 0:
+                ok = False
+        if ok:
+            # assert -0.5 * np.pi <= teta <= 0.5 * np.pi
+            scale = 1.
+            if transform is not None:
+                scale = transform[0, 0]
+            center_x, center_y = int(x * scale), int(y * scale)
+            axis_a, axis_b = int(a * scale), int(b * scale)
+            teta_degrees = teta * 180. / np.pi
+            start_angle, stop_angle = 0, 360
+            ellipse_color = (0, 0, 255)
+            ellipse_thickness = 2
+            vis_img = cv2.ellipse(vis_img, (center_x, center_y), (axis_a, axis_b), teta_degrees, start_angle, stop_angle,
+                                  ellipse_color, ellipse_thickness)
 
-    rotate_matrix = cv2.getRotationMatrix2D(center=(center_x, center_y), angle=teta_degrees, scale=1.)
-    a_line = np.asarray([[center_x - axis_a, center_y, 1], [center_x + axis_a, center_y, 1]])
-    b_line = np.asarray([[center_x, center_y - axis_b, 1], [center_x, center_y + axis_b, 1]])
-    a_rotated = np.dot(rotate_matrix, a_line.T).T
-    b_rotated = np.dot(rotate_matrix, b_line.T).T
+            rotate_matrix = cv2.getRotationMatrix2D(center=(center_x, center_y), angle=teta_degrees, scale=1.)
+            a_line = np.asarray([[center_x - axis_a, center_y, 1], [center_x + axis_a, center_y, 1]])
+            b_line = np.asarray([[center_x, center_y - axis_b, 1], [center_x, center_y + axis_b, 1]])
+            a_rotated = np.dot(rotate_matrix, a_line.T).T
+            b_rotated = np.dot(rotate_matrix, b_line.T).T
 
-    a_axis_begin = (int(a_rotated[0, 0]), int(a_rotated[0, 1]))
-    a_axis_end = (int(a_rotated[1, 0]), int(a_rotated[1, 1]))
-    b_axis_begin = (int(b_rotated[0, 0]), int(b_rotated[0, 1]))
-    b_axis_end = (int(b_rotated[1, 0]), int(b_rotated[1, 1]))
-    vis_img = cv2.line(vis_img, a_axis_begin, a_axis_end, (0, 255, 0), 1)
-    vis_img = cv2.line(vis_img, b_axis_begin, b_axis_end, (255, 0, 0), 1)
+            a_axis_begin = (int(a_rotated[0, 0]), int(a_rotated[0, 1]))
+            a_axis_end = (int(a_rotated[1, 0]), int(a_rotated[1, 1]))
+            b_axis_begin = (int(b_rotated[0, 0]), int(b_rotated[0, 1]))
+            b_axis_end = (int(b_rotated[1, 0]), int(b_rotated[1, 1]))
+            vis_img = cv2.line(vis_img, a_axis_begin, a_axis_end, (0, 255, 0), 1)
+            vis_img = cv2.line(vis_img, b_axis_begin, b_axis_end, (255, 0, 0), 1)
     return vis_img
 
 

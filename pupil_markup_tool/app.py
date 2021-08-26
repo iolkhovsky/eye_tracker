@@ -105,7 +105,7 @@ class guiApp(QtWidgets.QMainWindow, Ui_Dialog):
                 self.label_teta.setText("{:.2f}".format(teta * 180. / np.pi))
                 self.label_yaw.setText("{:.2f}".format(yaw))
                 self.label_pitch.setText("{:.2f}".format(pitch))
-                vis_img = visualize_ellipse(self.canonical, self.markup.visualization, self.markup.transform)
+                vis_img = visualize_ellipse(self.canonical, self.checkBoxPupil.checkState(), self.markup.visualization, self.markup.transform)
                 if vis_img is not None:
                     self.markup.visualization = vis_img
 

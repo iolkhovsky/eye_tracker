@@ -53,7 +53,7 @@ def run_extraction(args):
                     y.numpy(),
                     teta.numpy(),
                 )
-                visualization = visualize_ellipse(canonical, visualization, transform)
+                visualization = visualize_ellipse(canonical, pupil.numpy(), visualization, transform)
             cv2.imwrite(join(args.output, filename), visualization)
 
 

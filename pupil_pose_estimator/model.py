@@ -14,9 +14,7 @@ class PupilPoseEstimator(tf.keras.Model):
         self.do = tf.keras.layers.Dropout(rate=do_rate)
         self.bn = tf.keras.layers.BatchNormalization()
         self.dense = tf.keras.layers.Dense(units=6)
-        self.clf_act = tf.keras.layers.Activation(tf.nn.sigmoid)
         self.angle_act = tf.keras.layers.Activation(tf.nn.tanh)
-        self.spatial_act = tf.keras.layers.Activation(tf.nn.sigmoid)
 
     def call(self, image, training=False):
         features = self.backbone(image, training=training)
@@ -26,18 +24,8 @@ class PupilPoseEstimator(tf.keras.Model):
         features = self.dense(features)
         return tf.concat(
             (
-                tf.expand_dims(features[:, 0], axis=1),
-                self.spatial_act(features[:, 1:5]),
+                features[:, :5],
                 tf.expand_dims(self.angle_act(features[:, 5]), axis=1)
             ),
-            axis=1
-        )
-
-    def predict(self, image):
-        prediction = self.call(image, training=False)
-        logits, ellipse_pars = prediction[:, 0], prediction[:, 1:]
-        pupile_conf = self.clf_act(logits)
-        return tf.concat(
-            (tf.expand_dims(pupile_conf, axis=1), ellipse_pars),
             axis=1
         )

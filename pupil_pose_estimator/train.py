@@ -7,6 +7,7 @@ import tensorflow as tf
 
 from common_utils.file_utils import read_yaml
 from dataset.label_encoder import LabelEncoder
+from pupil_pose_estimator.prediction_codec import PredictionCodec
 from pupil_pose_estimator.loss import PupilEstimatorLoss
 from pupil_pose_estimator.model import PupilPoseEstimator
 from pupil_pose_estimator.normalization import build_normalizer, build_denormalizer
@@ -48,7 +49,8 @@ def run_training(args):
 
     normalizer = build_normalizer(config)
     denormalizer = build_denormalizer(config)
-    encoder = LabelEncoder(normalizer)
+    prediction_codec = PredictionCodec(img_size=int(config["model"]["input_size"]))
+    encoder = LabelEncoder(prediction_encoder=prediction_codec, img_normalizer=normalizer)
     train_dataset = tf.data.TFRecordDataset(config["dataset"]["train"]["tfrecords"])
     train_dataset = train_dataset.map(encoder).batch(config["dataset"]["train"]["batch_size"])
     val_dataset = tf.data.TFRecordDataset(config["dataset"]["val"]["tfrecords"])
@@ -59,9 +61,9 @@ def run_training(args):
     def visualize_prediction(epoch, logs):
         val_imgs, val_labels = next(iter(val_dataset))
         val_batch_size = len(val_imgs)
-        val_preds = model.predict(val_imgs)
-        target_visualization = visualize_pupil(val_imgs, val_labels, denormalizer)
-        pred_visualization = visualize_pupil(val_imgs, val_preds, denormalizer)
+        val_preds = prediction_codec.decode(model(val_imgs))
+        target_visualization = visualize_pupil(val_imgs, prediction_codec.decode(val_labels), denormalizer)
+        pred_visualization = visualize_pupil(val_imgs, prediction_codec.decode(val_preds), denormalizer)
         writer = tf.summary.create_file_writer(join(logs_path, "visualization_val"))
         with writer.as_default():
             tf.summary.image("target", target_visualization, step=epoch, max_outputs=val_batch_size)
@@ -70,9 +72,9 @@ def run_training(args):
         train_batch_size = len(train_imgs)
         train_imgs, train_labels = train_imgs[:min(train_batch_size, val_batch_size)], \
                                    train_labels[:min(train_batch_size, val_batch_size)]
-        train_preds = model.predict(train_imgs)
-        target_visualization = visualize_pupil(train_imgs, train_labels, denormalizer)
-        pred_visualization = visualize_pupil(train_imgs, train_preds, denormalizer)
+        train_preds = prediction_codec.decode(model(train_imgs))
+        target_visualization = visualize_pupil(train_imgs, prediction_codec.decode(train_labels), denormalizer)
+        pred_visualization = visualize_pupil(train_imgs, prediction_codec.decode(train_preds), denormalizer)
         writer = tf.summary.create_file_writer(join(logs_path, "visualization_train"))
         with writer.as_default():
             tf.summary.image("target", target_visualization, step=epoch, max_outputs=train_batch_size)

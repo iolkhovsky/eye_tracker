@@ -5,7 +5,8 @@ from dataset.tfrecord_utils import decode_fn
 
 class LabelEncoder:
 
-    def __init__(self, img_normalizer=None):
+    def __init__(self, prediction_encoder, img_normalizer=None):
+        self._encoder = prediction_encoder
         self.normalizer = img_normalizer
 
     def __str__(self):
@@ -28,7 +29,7 @@ class LabelEncoder:
             ],
             axis=0
         )
-        return img, label
+        return img, self._encoder(label)
 
     def __call__(self, *args, **kwargs):
         return self.encode(*args, **kwargs)

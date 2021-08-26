@@ -20,12 +20,16 @@ class PredictionCodec:
         :param target: 2d tensor, row:
         [pupil_conf [0...1], ellipse_a [float], ellipse_b[float], ellipse_x[float], ellipse_y[float], teta[+|-0.5pi]]
         """
-        assert isinstance(target, tf.Tensor) and target.shape[1] == 6
+        target_shape = target.shape
+        assert isinstance(target, tf.Tensor)
+        if len(target_shape) < 2:
+            target = tf.expand_dims(target, axis=0)
+        assert target.shape[1] == 6
         labels = tf.expand_dims(target[:, 0], 1)
         ellipse_axis = target[:, 1:3]
         center_coordinates = target[:, 3:5]
         angles = tf.expand_dims(target[:, 5], 1)
-        return tf.concat(
+        result = tf.concat(
             [
                 labels,
                 tf.math.multiply(ellipse_axis, self._k_size),
@@ -34,6 +38,7 @@ class PredictionCodec:
             ],
             axis=1
         )
+        return tf.reshape(result, shape=target_shape)
 
     def decode(self, prediction):
         """
@@ -53,3 +58,6 @@ class PredictionCodec:
             ],
             axis=1
         )
+
+    def __call__(self, *args, **kwargs):
+        return self.encode(*args, **kwargs)

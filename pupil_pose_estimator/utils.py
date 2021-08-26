@@ -32,8 +32,8 @@ def visualize_pupil(tf_images, tf_labels, denormalizer=None, min_img_size=128):
         if vis_scale > 1.:
             transform = np.asarray([[vis_scale, 0, 0], [0, vis_scale, 0]], dtype=np.float32)
             img = cv2.resize(img, (min_img_size, min_img_size))
-        prob, a, b, x, y, teta = label.numpy()
-        canonical = a * img_size, b * img_size, x * img_size, y * img_size, teta * np.pi * 0.5
-        vis_img = visualize_ellipse(canonical, img, transform)
+        prob = label.numpy()[0]
+        canonical = label.numpy()[1:]
+        vis_img = visualize_ellipse(canonical, prob, img, transform)
         out.append(tf.convert_to_tensor(vis_img))
     return out

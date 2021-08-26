@@ -26,26 +26,35 @@ def run_extraction(args):
         rmtree(args.output)
     makedirs(args.output)
 
-    for batch in tf.data.TFRecordDataset([args.file]).map(decode_fn):
-        img_buffer = batch["image/encoded"].numpy()
-        img = cv2.imdecode(np.frombuffer(img_buffer, dtype=np.uint8), cv2.IMREAD_COLOR)
-        filename = basename(batch["image/filename"].numpy()).decode("utf-8")
-        visualization = cv2.resize(img, (args.img_size, args.img_size))
-        scale = args.img_size / img.shape[0]
-        transform = np.asarray([
-            [scale, 0, 0.],
-            [0, scale, 0.]
-        ])
-        if batch["pupil"]:
-            canonical = (
-                batch["canonical/a"].numpy(),
-                batch["canonical/b"].numpy(),
-                batch["canonical/x"].numpy(),
-                batch["canonical/y"].numpy(),
-                batch["canonical/t"].numpy(),
-            )
-            visualization = visualize_ellipse(canonical, visualization, transform)
-        cv2.imwrite(join(args.output, filename), visualization)
+    for batch in tf.data.TFRecordDataset([args.file]).map(decode_fn).batch(2):
+        img_batch = batch["image/encoded"]
+        filename_batch = batch["image/filename"]
+        pupil_batch = batch["pupil"]
+        a_batch = batch["canonical/a"]
+        b_batch = batch["canonical/b"]
+        x_batch = batch["canonical/x"]
+        y_batch = batch["canonical/y"]
+        teta_batch = batch["canonical/t"]
+        for img, filename, a, b, x, y, teta, pupil in zip(img_batch, filename_batch, a_batch, b_batch, x_batch, y_batch, teta_batch, pupil_batch):
+            img_buffer = img.numpy()
+            img = cv2.imdecode(np.frombuffer(img_buffer, dtype=np.uint8), cv2.IMREAD_COLOR)
+            filename = basename(filename.numpy()).decode("utf-8")
+            visualization = cv2.resize(img, (args.img_size, args.img_size))
+            scale = args.img_size / img.shape[0]
+            transform = np.asarray([
+                [scale, 0, 0.],
+                [0, scale, 0.]
+            ])
+            if pupil.numpy():
+                canonical = (
+                    a.numpy(),
+                    b.numpy(),
+                    x.numpy(),
+                    y.numpy(),
+                    teta.numpy(),
+                )
+                visualization = visualize_ellipse(canonical, visualization, transform)
+            cv2.imwrite(join(args.output, filename), visualization)
 
 
 if __name__ == "__main__":
